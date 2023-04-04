@@ -1,0 +1,7 @@
+{
+  "name": "@ideadesignmedia/whisper.js",
+  "version": "1.0.1",
+  "main": "index.js",
+  "author": "Sam Wagner <60307610+ideadesignmedia@users.noreply.github.com>",
+  "license": "MIT"
+}
