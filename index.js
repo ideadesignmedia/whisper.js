@@ -2,6 +2,7 @@ const { exec } = require('child_process');
 const path = require('path')
 const toSnakeLower = (str) => str.replace(/([A-Z])/g, (g) => `_${g[0].toLowerCase()}`).replace(/^_/, '')
 const whisper = (files = [], output, options = {}) => new Promise((res, rej) => {
+    files = files.map(file => path.isAbsolute(file) ? file : path.join(process.cwd(), file))
     const args = {}
     if (options.translate) args.task = 'translate'
     if (options.language) args.language = options.language
@@ -20,7 +21,6 @@ const whisper = (files = [], output, options = {}) => new Promise((res, rej) => 
     if (options.suppressTokens) args.suppressTokens = options.suppressTokens
     if (options.initialPrompt) args.initialPrompt = options.initialPrompt
     if (options.conditionOnPreviousText) args.conditionOnPreviousText = options.conditionOnPreviousText
-    if (options.fp16) args.fp16 = options.fp16
     if (options.temperatureIncrementOnFallback) args.temperatureIncrementOnFallback = options.temperatureIncrementOnFallback
     if (options.compressionRatioThreshold) args.compressionRatioThreshold = options.compressionRatioThreshold
     if (options.logprobThreshold) args.logprobThreshold = options.logprobThreshold
@@ -29,6 +29,12 @@ const whisper = (files = [], output, options = {}) => new Promise((res, rej) => 
     if (options.prependPunctuations) args.prependPunctuations = options.prependPunctuations
     if (options.appendPunctuations) args.appendPunctuations = options.appendPunctuations
     if (options.threads) args.threads = options.threads
+    if (options.device) args.device = options.device
+    else {
+        args.device = 'cpu'
+        args.fp16 = 'False'
+    }
+    if (options.fp16) args.fp16 = options.fp16
     exec(`whisper ${files.join(' ')} ${Object.entries(args).map(([arg, value]) => `--${toSnakeLower(arg)} ${value}`).join(' ')}`, (err, stdout, stderr) => {
         if (err) {
             return rej(err)
